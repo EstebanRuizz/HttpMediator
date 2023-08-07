@@ -25,7 +25,6 @@ export class AppComponent implements OnInit {
     };
 
     const params: CommandParamsWithPayload<CreateUserDTO, UserDTO> = {
-      commandClass: UserCommand,
       method: UserCommand.prototype.createUser,
       data: createUserDto,
       callbacks,
@@ -40,14 +39,12 @@ export class AppComponent implements OnInit {
       error: this.onHttpError.bind(this),
     }; 
     const params: CommandParamsNoPayload<unknown, UserDTO[]> = {
-      commandClass: UserQuery,
       method: UserQuery.prototype.getUsers,
       callbacks,
     };
     this.httpMediator.execNoPayload(params);
   }  
-  
-  
+    
   onCreateUserSuccess(response: UserDTO) {
     console.log(response, ' AT onCreateUserSuccess ');
   }

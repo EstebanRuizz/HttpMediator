@@ -4,31 +4,26 @@ import { Observable } from 'rxjs';
 import { HttpMediatorCallbacks } from './HttpMediatorCallbacks';
 
 export interface CommandParamsWithPayload<TRequest, TResponse> {
-  commandClass: CommandClass<TRequest>;
   method: CommandMethodWithPayload<TRequest, TResponse>;
   callbacks: HttpMediatorCallbacks<TResponse>;
   data: TRequest;
 }
 
 export interface CommandParamsNoPayload<TRequest, TResponse> {
-  commandClass: CommandClass<TRequest>;
   method: CommandMethodNoPayload<TResponse>;
   callbacks: HttpMediatorCallbacks<TResponse>;
 }
 
 type CommandMethodWithPayload<TRequest, TResponse> = (instance: TRequest) => Observable<TResponse>;
 type CommandMethodNoPayload<TResponse> = () => Observable<TResponse>;
-type CommandClass<TRequest> = new (http: HttpClient) => TRequest;
 
 @Injectable()
 export class HttpMediator {
   constructor(private http: HttpClient) {}
 
   execWithPayload<TRequest, TResponse>(params: CommandParamsWithPayload<TRequest, TResponse>): void {
-    const { commandClass, method, data, callbacks } = params;
-    const commandInstance = new commandClass(this.http);
-
-    method.call(commandInstance, data).subscribe({
+    const { method, data, callbacks } = params;
+    method.call(null, data).subscribe({
       next: (response: TResponse) => {
         callbacks.success(response);
       },
@@ -39,10 +34,8 @@ export class HttpMediator {
   }
 
   execNoPayload<TRequest, TResponse>(params: CommandParamsNoPayload<TRequest, TResponse>): void {
-    const { commandClass, method, callbacks } = params;
-    const commandInstance = new commandClass(this.http);
-
-    method.call(commandInstance).subscribe({
+    const { method, callbacks } = params;
+    method.call(null).subscribe({
       next: (response: TResponse) => {
         callbacks.success(response);
       },
@@ -52,6 +45,7 @@ export class HttpMediator {
     });
   }
 }
+
 
 
 
