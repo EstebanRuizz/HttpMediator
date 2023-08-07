@@ -13,6 +13,9 @@ import { CommandParamsNoPayload, CommandParamsWithPayload, HttpMediator, HttpMed
 })
 export class AppComponent implements OnInit {
   constructor(private httpMediator: HttpMediator) {}
+  
+  title = ''
+  
   ngOnInit(): void {
     this.onGetAllUsers()
   }
