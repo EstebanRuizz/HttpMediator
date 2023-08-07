@@ -1,18 +1,21 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
 
 import { AppRoutingModule } from './app-routing.module';
-import { UserCRUDComponent } from './app.component';
+import { AppComponent } from './app.component';
+import { HttpMediator } from './HttpMediator';
 
 @NgModule({
   declarations: [
-    UserCRUDComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule // Add HttpClientModule to the imports array
   ],
-  providers: [],
-  bootstrap: [UserCRUDComponent]
+  providers: [HttpMediator],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
