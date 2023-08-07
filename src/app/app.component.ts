@@ -1,11 +1,10 @@
-import { Component, Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Component, Injectable, OnInit } from '@angular/core';
 
 import { UserDTO } from './UserDTO';
-import { CommandParamsNoPayload, CommandParamsWithPayload, HttpMediator } from './HttpMediator';
-import { UserCommand } from './UserCommand';
 import { UserQuery } from './UserQuery';
-import { HttpMediatorCallbacks } from './HttpMediatorCallbacks';
+import { UserCommand } from './UserCommand';
+import { CommandParamsNoPayload, CommandParamsWithPayload, HttpMediator, HttpMediatorCallbacks } from './HttpMediator';
 
 @Component({
   selector: 'app-root',
@@ -17,19 +16,20 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.onGetAllUsers()
   }
+  createUserDto: CreateUserDTO = { email: 'ana@an.com' };
+  
+  
   onCreateUser(): void {
-    const createUserDto: CreateUserDTO = { email: 'ana@an.com' };
     const callbacks: HttpMediatorCallbacks<UserDTO> = {
       success: this.onCreateUserSuccess.bind(this),
       error: this.onHttpError.bind(this),
     };
-
     const params: CommandParamsWithPayload<CreateUserDTO, UserDTO> = {
+      commandClass: UserCommand,
       method: UserCommand.prototype.createUser,
-      data: createUserDto,
+      data: this.createUserDto,
       callbacks,
     };
-
     this.httpMediator.execWithPayload(params);
   }
 
@@ -38,7 +38,8 @@ export class AppComponent implements OnInit {
       success: this.onGetAllUsersSuccess.bind(this),
       error: this.onHttpError.bind(this),
     }; 
-    const params: CommandParamsNoPayload<unknown, UserDTO[]> = {
+    const params: CommandParamsNoPayload<UserDTO[]> = {
+      commandClass: UserQuery,
       method: UserQuery.prototype.getUsers,
       callbacks,
     };

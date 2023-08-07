@@ -6,13 +6,11 @@ import { UserDTO } from "./UserDTO";
 
 
 @Injectable()
-export class UserCommand implements CreateUserDTO {
+export class UserCommand {
   constructor(private http: HttpClient) {}
 
-  email!: string;
-
   url = 'http://localhost:4200/user';
-
+    
   createUser(createUserDto: CreateUserDTO): Observable<UserDTO> {
     return this.http.post<UserDTO>(this.url, createUserDto);
   }
