@@ -3,43 +3,33 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpMediatorCallbacks } from './HttpMediatorCallbacks';
 
-export interface CommandParams<TRequest, TResponse> {
+export interface CommandParamsWithPayload<TRequest, TResponse> {
   commandClass: CommandClass<TRequest>;
-  method: CommandMethod<TRequest, TResponse>;
+  method: CommandMethodWithPayload<TRequest, TResponse>;
   callbacks: HttpMediatorCallbacks<TResponse>;
-  data?: TRequest;
+  data: TRequest;
 }
 
-type CommandMethod<TRequest, TResponse> = (instance?: TRequest) => Observable<TResponse>;
+export interface CommandParamsNoPayload<TRequest, TResponse> {
+  commandClass: CommandClass<TRequest>;
+  method: CommandMethodNoPayload<TResponse>;
+  callbacks: HttpMediatorCallbacks<TResponse>;
+}
 
+type CommandMethodWithPayload<TRequest, TResponse> = (instance: TRequest) => Observable<TResponse>;
+type CommandMethodNoPayload<TResponse> = () => Observable<TResponse>;
 type CommandClass<TRequest> = new (http: HttpClient) => TRequest;
 
 @Injectable()
 export class HttpMediator {
   constructor(private http: HttpClient) {}
-  
-  exec<TRequest, TResponse>(
-    params: CommandParams<TRequest, TResponse>
-  ): void {
-    const { commandClass, method, callbacks, data } = params;
 
+  execWithPayload<TRequest, TResponse>(params: CommandParamsWithPayload<TRequest, TResponse>): void {
+    const { commandClass, method, data, callbacks } = params;
     const commandInstance = new commandClass(this.http);
 
-    if (data) {
-      this.execWithPayload(method, commandInstance, data, callbacks);
-    } else {
-      this.execWithoutPayload(method, commandInstance, callbacks);
-    }
-  }
-
-  private execWithPayload<TRequest, TResponse>(
-    commandMethod: CommandMethod<TRequest, TResponse>,
-    commandInstance: TRequest,
-    data: TRequest,
-    callbacks: HttpMediatorCallbacks<TResponse>
-  ): void {
-    commandMethod.call(commandInstance, data).subscribe({
-      next: (response: any) => {
+    method.call(commandInstance, data).subscribe({
+      next: (response: TResponse) => {
         callbacks.success(response);
       },
       error: (error: any) => {
@@ -48,13 +38,12 @@ export class HttpMediator {
     });
   }
 
-  private execWithoutPayload<TRequest, TResponse>(
-    commandMethod: CommandMethod<TRequest, TResponse>,
-    commandInstance: TRequest,
-    callbacks: HttpMediatorCallbacks<TResponse>
-  ): void {
-    commandMethod.call(commandInstance).subscribe({
-      next: (response: any) => {
+  execNoPayload<TRequest, TResponse>(params: CommandParamsNoPayload<TRequest, TResponse>): void {
+    const { commandClass, method, callbacks } = params;
+    const commandInstance = new commandClass(this.http);
+
+    method.call(commandInstance).subscribe({
+      next: (response: TResponse) => {
         callbacks.success(response);
       },
       error: (error: any) => {
@@ -63,8 +52,6 @@ export class HttpMediator {
     });
   }
 }
-
-
 
 
 
