@@ -13,7 +13,7 @@ export class UserCommand implements CreateUserDTO {
 
   url = 'http://localhost:4200/user';
 
-  createUser(createUserDto?: CreateUserDTO): Observable<UserDTO> {
+  createUser(createUserDto: CreateUserDTO): Observable<UserDTO> {
     return this.http.post<UserDTO>(this.url, createUserDto);
   }
 }

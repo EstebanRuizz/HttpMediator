@@ -38,14 +38,12 @@ export class AppComponent implements OnInit {
     const callbacks: HttpMediatorCallbacks<UserDTO[]> = {
       success: this.onGetAllUsersSuccess.bind(this),
       error: this.onHttpError.bind(this),
-    };
-
+    }; 
     const params: CommandParamsNoPayload<unknown, UserDTO[]> = {
       commandClass: UserQuery,
       method: UserQuery.prototype.getUsers,
       callbacks,
     };
-
     this.httpMediator.execNoPayload(params);
   }  
   
